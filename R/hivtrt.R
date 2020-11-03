@@ -34,11 +34,18 @@ tx.adhere.full <- dat$param[[scenario]]$tx.adhere.full
 tx.adhere.part <- dat$param[[scenario]]$tx.adhere.part
 tx.lfu <- dat$param[[scenario]]$tx.lfu
 
-set.seed(12) # ensuring facility parameters do not change from one period to the next
-tx.adhere.full.fac <- dat$param$tx.adhere.full.fac <- pmax(0,pmin(1,rnorm(n = length(unique(facility)), mean = tx.adhere.full, sd = tx.adhere.full/5)))
-tx.lfu.fac <- dat$param$tx.lfu.fac <- pmax(0,pmin(1,rnorm(n = length(unique(facility)), mean = tx.lfu, sd = tx.lfu/5)))
-tx.adhere.part.fac <- dat$param$tx.adhere.part.fac <- pmax(0,pmin(1,rnorm(n = length(unique(facility)), mean = tx.adhere.part, sd = tx.adhere.part/5)))
+# ensuring facility parameters do not change from one period to the next
 
+if(at == 1){
+  
+  tx.adhere.full.fac <- dat$param$tx.adhere.full.fac <- pmax(0,pmin(1,rnorm(n = length(unique(facility)), mean = tx.adhere.full, sd = tx.adhere.full/5)))
+  tx.lfu.fac <- dat$param$tx.lfu.fac <- pmax(0,pmin(1,rnorm(n = length(unique(facility)), mean = tx.lfu, sd = tx.lfu/5)))
+  tx.adhere.part.fac <- dat$param$tx.adhere.part.fac <- pmax(0,pmin(1,rnorm(n = length(unique(facility)), mean = tx.adhere.part, sd = tx.adhere.part/5)))
+  
+} else
+  tx.adhere.full.fac <- dat$param$tx.adhere.full.fac
+tx.lfu.fac <- dat$param$tx.lfu.fac
+tx.adhere.part.fac <- dat$param$tx.adhere.part.fac 
 
 # Start tx for tx naive ---------------------------------------------------
 

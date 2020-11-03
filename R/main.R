@@ -54,7 +54,7 @@ init <- init(i.prev.male = 1,
 
 for(scenario_simulation in names(list_scenarios)){
   print(scenario_simulation)
-  assign(paste0("result_", scenario_simulation), run_simulations(init, param, scenario_simulation, intervention_start = 0, prop_male, nsteps = 52 * 5, nsim = 100))
+  assign(paste0("result_", scenario_simulation), run_simulations(init, param, scenario_simulation, intervention_start = 0, prop_male, nsteps = 52 * 7, nsim = 100))
 }
 
 ## Simulation results for the different scenarios
@@ -75,7 +75,7 @@ res <- bind_rows(
     scenario = "baseline"
   ),
   tibble(
-    death = res_1$death$deaths,
+    Death = res_1$death$deaths,
     `New infection` = res_1$newInf$newInf,
     `Lost to follow-up` = res_1$LTFU$LTFU,
     `On treatment` = res_1$onTrt$onTrt,
