@@ -17,11 +17,13 @@ result_comparison_plot <- function(res){
     group_by(time,scenario, variable) %>%
     summarize(mean = mean(value),
               q2.5 = quantile(value, probs = .025),
-              q97.5 = quantile(value, probs = .975))) 
+              q97.5 = quantile(value, probs = .975)))
+  p1 <- p %>% filter(variable != "Death" & variable != "New infection")
+  p2 <- p %>% filter(variable == "Death" | variable == "New infection")
   
-  gg <- ggplot(data = p, aes(x = time, y = mean, group = scenario)) +
+  gg1 <- ggplot(data = p1, aes(x = time, y = mean, group = scenario)) +
     geom_line(aes(colour = scenario)) +
-    geom_ribbon(data = p, aes(ymin= q2.5, ymax=q97.5, fill = scenario), linetype=2, alpha=0.1) +
+    geom_ribbon(data = p1, aes(ymin= q2.5, ymax=q97.5, fill = scenario), linetype=2, alpha=0.1) +
     facet_wrap(~variable, scales = "free") +
     labs(x ='Time', y = 'Outcome',
          title = paste0("Simulation results")) +
@@ -36,7 +38,18 @@ result_comparison_plot <- function(res){
           panel.grid.major = element_blank(), panel.grid.minor  = element_blank(),
           axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5, size = 14))
   
-
+  gg2 <- ggplot(p2, aes(x=mean, fill=scenario)) + geom_density(alpha=.3)+
+    facet_wrap(~variable, scales = "free") +
+    theme_bw() +
+    scale_fill_manual(values = c("#0d4e93", "#ffdc00")) +
+    scale_color_manual(values=c("#0d4e93", "#ffdc00")) +
+    labs(x ='Value', y = 'Frequency') +
+    theme(strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
+          strip.text = element_text(size = 10),
+          panel.grid.major = element_blank(), panel.grid.minor  = element_blank(),
+          axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5, size = 14))
+  
+  gg <- gridExtra::grid.arrange(gg1,gg2)
   return(gg)
 }
 
