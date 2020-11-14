@@ -39,6 +39,7 @@ run_abm <- function(init, param, scenario_simulation, intervention_start = 0, pr
     dat <- transmission(dat, at)
     dat$epi$diag[at] <- 0
     dat$epi$onTrt[at] <- 0
+    dat$epi$Lfu[at] <- 0
     
     for (at in 2:nsteps) {
       
@@ -71,6 +72,7 @@ run_abm <- function(init, param, scenario_simulation, intervention_start = 0, pr
     dat <- transmission(dat, at)
     dat$epi$diag[at] <- 0
     dat$epi$onTrt[at] <- 0
+    dat$epi$Lfu[at] <- 0
     
     for (at in 2:nsteps) {
       
