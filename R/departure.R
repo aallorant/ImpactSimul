@@ -29,8 +29,7 @@ deaths <- function(dat, at) {
   
   ## Eligible individuals for susceptible deaths are uninfected, or pre-death infected but unhealthy old
   idsEligSus <- which((is.na(cd4Count) |
-                         cd4Count > di.cd4.aids |
-                         (cd4Count <= di.cd4.aids & age > ds.exit.age)))
+                         cd4Count > di.cd4.aids))
   nEligSus <- length(idsEligSus)
 
   # Set age-sex specific rates

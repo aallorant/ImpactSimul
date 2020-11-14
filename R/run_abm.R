@@ -30,44 +30,63 @@ run_abm <- function(init, param, scenario_simulation, intervention_start = 0, pr
                       nsteps)
     
     dat$param$prop_male <- prop_male
+    at <- 1
+    dat <- prevalence(dat, at)
+    dat <- aging(dat, at)
+    dat <- cd4(dat, at)
+    dat <- deaths(dat, at)
+    dat <- vl(dat, at)
+    dat <- transmission(dat, at)
+    dat$epi$diag[at] <- 0
+    dat$epi$onTrt[at] <- 0
     
-    for (at in 1:nsteps) {
+    for (at in 2:nsteps) {
       
       dat <- prevalence(dat, at)
       dat <- aging(dat, at)
       dat <- cd4(dat, at)
       dat <- deaths(dat, at)
-      if(at > 1) dat <- arrival(dat,at, scenario)
+      dat <- arrival(dat,at, scenario)
       dat <- test(dat, at, scenario)
       dat <- trt(dat, at, scenario)
       dat <- vl(dat, at)
       dat <- transmission(dat, at)
       
     }
-  }
-  else
+  } else {
     dat <- initialize(init, 
                       param, 
                       scenario = "parameters_baseline",
                       prop_male,
                       nsteps)
   
-  dat$param$prop_male <- prop_male
-  
-  for (at in 1:nsteps) {
+    dat$param$prop_male <- prop_male
     
-    scenario <- ifelse(intervention_start > at, "parameters_baseline", scenario_simulation)
-    
+    at <- 1
     dat <- prevalence(dat, at)
-    dat <- aging(dat)
+    dat <- aging(dat, at)
     dat <- cd4(dat, at)
     dat <- deaths(dat, at)
-    if(at > 1) dat <- arrival(dat,at, scenario)
-    dat <- test(dat, at, scenario)
-    dat <- trt(dat, at, scenario)
     dat <- vl(dat, at)
     dat <- transmission(dat, at)
+    dat$epi$diag[at] <- 0
+    dat$epi$onTrt[at] <- 0
     
+    for (at in 2:nsteps) {
+      
+      scenario <- ifelse(intervention_start > at, "parameters_baseline", scenario_simulation)
+      
+      dat <- prevalence(dat, at)
+      dat <- aging(dat)
+      dat <- cd4(dat, at)
+      dat <- deaths(dat, at)
+      dat <- arrival(dat,at, scenario)
+      dat <- test(dat, at, scenario)
+      dat <- trt(dat, at, scenario)
+      dat <- vl(dat, at)
+      dat <- transmission(dat, at)
+      
+    }
   }
 
   

@@ -11,6 +11,7 @@ summary_outcomes <- function(simul_results){
   out[["newInf"]] = rbindlist(mapply(function(results, index){data.frame(simul = index, newInf=results$epi$si.flow, time=seq(length(results$epi$si)))}, simul_results, seq(length(simul_results)), SIMPLIFY =  F))
   out[["LTFU"]] = rbindlist(mapply(function(results, index){data.frame(simul = index, LTFU=results$epi$Lfu, time=seq(length(results$epi$Lfu)))}, simul_results, seq(length(simul_results)), SIMPLIFY =  F))
   out[["onTrt"]] = rbindlist(mapply(function(results, index){data.frame(simul = index, onTrt=results$epi$onTrt, time=seq(length(results$epi$onTrt)))}, simul_results, seq(length(simul_results)), SIMPLIFY =  F))
+  out[["Diagnosed"]] = rbindlist(mapply(function(results, index){data.frame(simul = index, diag=results$epi$diag, time=seq(length(results$epi$diag)))}, simul_results, seq(length(simul_results)), SIMPLIFY =  F))
   out[["VlSupp"]] = rbindlist(mapply(function(results, index){data.frame(simul = index, VlSupp=results$epi$VlSupp, time=seq(length(results$epi$VlSupp)))}, simul_results, seq(length(simul_results)), SIMPLIFY =  F))
   out[["meanAge"]] = rbindlist(mapply(function(results, index){data.frame(simul = index, meanAge=results$epi$meanAge, time=seq(length(results$epi$meanAge)))}, simul_results, seq(length(simul_results)), SIMPLIFY =  F))
   out[["AidsonART"]] = rbindlist(mapply(function(results, index){data.frame(simul = index, AidsonART=results$epi$AidsonART, time=seq(length(results$epi$AidsonART)))}, simul_results, seq(length(simul_results)), SIMPLIFY =  F))

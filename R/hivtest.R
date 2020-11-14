@@ -23,10 +23,9 @@ test <- function(dat, at, scenario) {
   dxStat <- dat$attr$dxStat
   
   # Process
-  # individuals diagnosed are individuals whose current CD4 count is below the CD4 count when they initiated ART, or selected at random for testing
+  # individuals diagnosed are individuals selected at random for testing
   tested <- which((rbinom(n = length(status),
-                          size = 1, prob = hiv.test.rate) == 1 & status == 1 & dxStat == 0)
-                  |(status == 1 & dxStat == 0 & cd4Count <= txCD4min))
+                          size = 1, prob = hiv.test.rate) == 1 & status == 1 & dxStat == 0))
   
   # Results
   if (length(tested) > 0) {
@@ -34,6 +33,6 @@ test <- function(dat, at, scenario) {
     dat$attr$txStat[tested] <- 0
     dat$attr$dxTime[tested] <- at
   }
-  
+  dat$epi$diag[at] <- sum(dat$attr$dxStat, na.rm = T)
   return(dat)
 }
