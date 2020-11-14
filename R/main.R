@@ -54,7 +54,7 @@ init <- init(i.prev.male = 1,
 
 for(scenario_simulation in names(list_scenarios)){
   print(scenario_simulation)
-  assign(paste0("result_", scenario_simulation), run_simulations(init, param, scenario_simulation, intervention_start = 0, prop_male, nsteps = 52 * 5, nsim = 1000))
+  assign(paste0("result_", scenario_simulation), run_simulations(init, param, scenario_simulation, intervention_start = 0, prop_male, nsteps = 52 * 5, nsim = 10))
 }
 
 ## Simulation results for the different scenarios
@@ -66,6 +66,7 @@ resSave <- res
 res <- bind_rows(
   tibble(
     Death = res_0$death$deaths,
+    `% Diagnosed` = res_0$Diagnosed$diag/res_0$n$num,
     `New infection` = res_0$newInf$newInf,
     `Lost to follow-up` = res_0$LTFU$LTFU,
     `On treatment` = res_0$onTrt$onTrt,
@@ -73,10 +74,12 @@ res <- bind_rows(
     `AIDS on treatment` = res_0$AidsonART$AidsonART,
     `AIDS off treatment` = res_0$AidsoffART$AidsoffART,
     time = res_0$death$time,
+    simul = rep(1:nsim, each = nsteps),
     scenario = "baseline"
   ),
   tibble(
     Death = res_1$death$deaths,
+    `% Diagnosed` = res_1$Diagnosed$diag/res_1$n$num,
     `New infection` = res_1$newInf$newInf,
     `Lost to follow-up` = res_1$LTFU$LTFU,
     `On treatment` = res_1$onTrt$onTrt,
@@ -84,6 +87,7 @@ res <- bind_rows(
     `AIDS on treatment` = res_1$AidsonART$AidsonART,
     `AIDS off treatment` = res_1$AidsoffART$AidsoffART,
     time = res_1$death$time,
+    simul = rep(1:nsim, each = nsteps),
     scenario = "intervention"
   )
 )

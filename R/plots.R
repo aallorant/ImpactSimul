@@ -19,7 +19,12 @@ result_comparison_plot <- function(res){
               q2.5 = quantile(value, probs = .025),
               q97.5 = quantile(value, probs = .975)))
   p1 <- p %>% filter(variable != "Death" & variable != "New infection")
-  p2 <- p %>% filter(variable == "Death" | variable == "New infection")
+  p2 <- suppressWarnings(res %>%
+                           data.table() %>%
+                           melt.data.table(id.vars = c("time","scenario","simul"))) %>%
+                          filter(variable == "Death" | variable == "New infection") %>%
+    group_by(scenario, variable,simul) %>%
+    summarize(deaths_cum = sum(value))
   
   gg1 <- ggplot(data = p1, aes(x = time, y = mean, group = scenario)) +
     geom_line(aes(colour = scenario)) +
@@ -38,7 +43,7 @@ result_comparison_plot <- function(res){
           panel.grid.major = element_blank(), panel.grid.minor  = element_blank(),
           axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5, size = 14))
   
-  gg2 <- ggplot(p2, aes(x=mean, fill=scenario)) + geom_density(alpha=.3)+
+  gg2 <- ggplot(p2, aes(x=deaths_cum, fill=scenario)) + geom_density(alpha=.3)+
     facet_wrap(~variable, scales = "free") +
     theme_bw() +
     scale_fill_manual(values = c("#0d4e93", "#ffdc00")) +
