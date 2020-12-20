@@ -2,6 +2,8 @@
 #'
 #' @param res object with simulations results (deaths, new infections, # patients off and on treatment, # of lost to follow-up)
 #'  from both the baseline and intervention scenarios
+#' @param h time horizon (in years) at which the results of the study need to be displayed
+#' default = 3 years
 #' @param daly object with simulations results in terms of DALYs from both the baseline and intervention scenarios
 #' @return 
 #' This function returns summary plots of the simulations' results. 
@@ -10,15 +12,16 @@ library(ggplot2)
 library(data.table)
 library(extrafont)
 
-result_comparison_plot <- function(res){
+result_comparison_plot <- function(res,h=3){
   p <- suppressWarnings(res %>%
     data.table() %>%
     melt.data.table(id.vars = c("time","scenario")) %>%
     group_by(time,scenario, variable) %>%
     summarize(mean = mean(value),
-              q2.5 = quantile(value, probs = .025),
-              q97.5 = quantile(value, probs = .975)))
-  p1 <- p %>% filter(variable != "Death" & variable != "New infection")
+              q2.5 = quantile(value, probs = .025, na.rm = T),
+              q97.5 = quantile(value, probs = .975, na.rm = T)) %>%
+      filter(time <= h*52))
+  p1 <- p %>% filter(variable != "Death" & variable != "New infection" & variable != "simul")
   p2 <- suppressWarnings(res %>%
                            data.table() %>%
                            melt.data.table(id.vars = c("time","scenario","simul"))) %>%

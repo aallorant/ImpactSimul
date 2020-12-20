@@ -74,7 +74,7 @@ res <- bind_rows(
     `AIDS on treatment` = res_0$AidsonART$AidsonART,
     `AIDS off treatment` = res_0$AidsoffART$AidsoffART,
     time = res_0$death$time,
-    simul = rep(1:nsim, each = nsteps),
+    simul = rep(1:n_sim, each = nsteps),
     scenario = "baseline"
   ),
   tibble(
@@ -87,12 +87,12 @@ res <- bind_rows(
     `AIDS on treatment` = res_1$AidsonART$AidsonART,
     `AIDS off treatment` = res_1$AidsoffART$AidsoffART,
     time = res_1$death$time,
-    simul = rep(1:nsim, each = nsteps),
+    simul = rep(1:n_sim, each = nsteps),
     scenario = "intervention"
   )
 )
 
-result_comparison_plot(res)
+result_comparison_plot(res, h = 5)
 ## DALYs comparison for the different scenarios
 
 DALYs_0 <- calculate_DALYs(res_0, parameters_bio, param)
