@@ -11,33 +11,31 @@
 library(ggplot2)
 library(data.table)
 library(extrafont)
+library(viridis)
 
 result_comparison_plot <- function(res,h=3){
-  p <- suppressWarnings(res %>%
-    data.table() %>%
-    melt.data.table(id.vars = c("time","scenario")) %>%
-    group_by(time,scenario, variable) %>%
-    summarize(mean = mean(value),
-              q2.5 = quantile(value, probs = .025, na.rm = T),
-              q97.5 = quantile(value, probs = .975, na.rm = T)) %>%
-      filter(time <= h*52))
-  p1 <- p %>% filter(variable != "Death" & variable != "New infection" & variable != "simul")
-  p2 <- suppressWarnings(res %>%
-                           data.table() %>%
-                           melt.data.table(id.vars = c("time","scenario","simul"))) %>%
-                          filter(variable == "Death" | variable == "New infection") %>%
-    group_by(scenario, variable,simul) %>%
-    summarize(deaths_cum = sum(value))
+  
+  tmp <- suppressWarnings(setDT(res) %>%
+                            data.table::melt(id.vars = c("time","scenario","simul"),
+                                             value.name = "outcome"))
+
+  p1 <- tmp[time <= h*52 & (variable != "Death" & variable != "New infection" & variable != "simul"),
+            list(mean = mean(outcome, na.rm = T),
+                 `2.5%` = quantile(outcome, probs = .025,na.rm=T),
+                 `97.5%` = quantile(outcome, probs = .975,na.rm=T)),by = 'time,scenario,variable']
+  
+  p2 <- tmp[time <= h*52 & (variable == "Death" | variable == "New infection"),
+            list(sum = sum(outcome, na.rm = T)),by = 'scenario,variable,simul']
   
   gg1 <- ggplot(data = p1, aes(x = time, y = mean, group = scenario)) +
     geom_line(aes(colour = scenario)) +
-    geom_ribbon(data = p1, aes(ymin= q2.5, ymax=q97.5, fill = scenario), linetype=2, alpha=0.1) +
+    geom_ribbon(data = p1, aes(ymin= `2.5%`, ymax=`97.5%`, fill = scenario), linetype=2, alpha=0.1) +
     facet_wrap(~variable, scales = "free") +
     labs(x ='Time', y = 'Outcome',
          title = paste0("Simulation results")) +
     theme_bw() +
-    scale_fill_manual(values = c("#0d4e93", "#ffdc00")) +
-    scale_color_manual(values=c("#0d4e93", "#ffdc00"))+
+    scale_fill_manual(values = viridis(length(unique(tmp$scenario)))) +
+    scale_color_manual(values=viridis(length(unique(tmp$scenario))))+
     scale_x_continuous(expand = c(0, 0)) +
     scale_y_continuous(limits = c(0, NA))+
     guides(fill=FALSE) +
@@ -46,11 +44,12 @@ result_comparison_plot <- function(res,h=3){
           panel.grid.major = element_blank(), panel.grid.minor  = element_blank(),
           axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5, size = 14))
   
-  gg2 <- ggplot(p2, aes(x=deaths_cum, fill=scenario)) + geom_density(alpha=.3)+
+  gg2 <- ggplot(data = p2,
+                aes(x=sum, fill=scenario)) + geom_density(alpha=.3)+
     facet_wrap(~variable, scales = "free") +
     theme_bw() +
-    scale_fill_manual(values = c("#0d4e93", "#ffdc00")) +
-    scale_color_manual(values=c("#0d4e93", "#ffdc00")) +
+    scale_fill_manual(values = viridis(length(unique(tmp$scenario)))) +
+    scale_color_manual(values=viridis(length(unique(tmp$scenario))))+
     labs(x ='Value', y = 'Frequency') +
     theme(strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
           strip.text = element_text(size = 10),
@@ -65,8 +64,8 @@ DALY_comparison <- function(daly){
   
   ggplot(daly, aes(x=dalys, fill=scenario)) + geom_density(alpha=.3)+
     theme_bw() +
-    scale_fill_manual(values = c("#0d4e93", "#ffdc00")) +
-    scale_color_manual(values=c("#0d4e93", "#ffdc00")) +
+    scale_fill_manual(values = viridis(length(unique(tmp$scenario)))) +
+    scale_color_manual(values=viridis(length(unique(tmp$scenario))))+
     labs(x ='DALYs', y = '',
          title = paste0("Simulation results")) +
     theme(strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
