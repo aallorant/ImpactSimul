@@ -84,7 +84,7 @@ res <- bind_rows(lapply(names(list_scenarios), function(m){
 
 ## Comparing the key metrics of the epidemics simulated under the different scenarios
 
-result_comparison_plot(res, h = 5)
+result_comparison_plot(res, h = 3)
 
 ## DALYs comparison for the different scenarios
 

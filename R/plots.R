@@ -19,19 +19,19 @@ result_comparison_plot <- function(res,h=3){
                             data.table::melt(id.vars = c("time","scenario","simul"),
                                              value.name = "outcome"))
 
-  p1 <- tmp[time <= h*52 & (variable != "Death" & variable != "New infection" & variable != "simul"),
+  p1 <- tmp[(variable != "Death" & variable != "New infection" & variable != "simul"),
             list(mean = mean(outcome, na.rm = T),
                  `2.5%` = quantile(outcome, probs = .025,na.rm=T),
                  `97.5%` = quantile(outcome, probs = .975,na.rm=T)),by = 'time,scenario,variable']
   
-  p2 <- tmp[time <= h*52 & (variable == "Death" | variable == "New infection"),
+  p2 <- tmp[(variable == "Death" | variable == "New infection"),
             list(sum = sum(outcome, na.rm = T)),by = 'scenario,variable,simul']
   
   gg1 <- ggplot(data = p1, aes(x = time, y = mean, group = scenario)) +
     geom_line(aes(colour = scenario)) +
     geom_ribbon(data = p1, aes(ymin= `2.5%`, ymax=`97.5%`, fill = scenario), linetype=2, alpha=0.1) +
     facet_wrap(~variable, scales = "free") +
-    labs(x ='Time', y = 'Outcome',
+    labs(x ='Week', y = 'Outcome',
          title = paste0("Simulation results")) +
     theme_bw() +
     scale_fill_manual(values = viridis(length(unique(tmp$scenario)))) +
@@ -42,7 +42,8 @@ result_comparison_plot <- function(res,h=3){
     theme(strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
           strip.text = element_text(size = 10),
           panel.grid.major = element_blank(), panel.grid.minor  = element_blank(),
-          axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5, size = 14))
+          axis.line = element_line(colour = "black"), plot.title = element_text(hjust = 0.5, size = 14)) +
+    geom_vline(xintercept = h*52, linetype = "dotted")
   
   gg2 <- ggplot(data = p2,
                 aes(x=sum, fill=scenario)) + geom_density(alpha=.3)+
@@ -50,7 +51,7 @@ result_comparison_plot <- function(res,h=3){
     theme_bw() +
     scale_fill_manual(values = viridis(length(unique(tmp$scenario)))) +
     scale_color_manual(values=viridis(length(unique(tmp$scenario))))+
-    labs(x ='Value', y = 'Frequency') +
+    labs(x ='Outcome', y = 'Probability') +
     theme(strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
           strip.text = element_text(size = 10),
           panel.grid.major = element_blank(), panel.grid.minor  = element_blank(),
@@ -66,7 +67,7 @@ DALY_comparison <- function(daly){
     theme_bw() +
     scale_fill_manual(values = viridis(length(unique(tmp$scenario)))) +
     scale_color_manual(values=viridis(length(unique(tmp$scenario))))+
-    labs(x ='DALYs', y = '',
+    labs(x ='DALYs', y = 'Probability',
          title = paste0("Simulation results")) +
     theme(strip.background = element_rect(color="white", fill="white", size=1.5, linetype="solid"),
           strip.text = element_text(size = 10),
